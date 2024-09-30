@@ -65,8 +65,13 @@ g_rotation_blue_paddle = glm::vec3(0.0f, 0.0f, 0.0f);
 GLuint g_red_paddle_texture_id,
 g_blue_paddle_texture_id;
 
-glm::vec3 g_red_paddle_transformation = glm::vec3(0.0f, 0.0f, 0.0f),
-g_blue_paddle_transformation = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 g_red_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
+g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
+g_blue_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
+g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+
+
+constexpr float g_paddle_speed = 1.0f;
 
 
 GLuint load_texture(const char* filepath)
@@ -161,18 +166,22 @@ void process_input()
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym)
                 {
-                    case SDLK_LEFT:
+                    case SDLK_w:
                         // Move the player left
+                        g_red_paddle_movement.y = 1.0f;
                         break;
 
-                    case SDLK_RIGHT:
+                    case SDLK_s:
                         // Move the player right
-                        g_shield_movement.x = 1.0f;
+                        g_red_paddle_movement.y = -1.0f;
                         break;
 
-                    case SDLK_q:
-                        // Quit the game with a keystroke
-                        g_app_status = TERMINATED;
+                    case SDLK_UP:
+                        g_blue_paddle_movement.y = 1.0f;
+                        break;
+
+                    case SDLK_DOWN:
+                        g_blue_paddle_movement.y = -1.0f;
                         break;
 
                     default:
@@ -184,22 +193,22 @@ void process_input()
 
     const Uint8* key_state = SDL_GetKeyboardState(NULL);
 
-    if (key_state[SDL_SCANCODE_LEFT])
+    if (key_state[SDL_SCANCODE_W])
     {
-        g_shield_movement.x = -1.0f;
+        g_red_paddle_movement.y = 1.0f;
     }
-    else if (key_state[SDL_SCANCODE_RIGHT])
+    else if (key_state[SDL_SCANCODE_S])
     {   
-        g_shield_movement.x = 1.0f;
+        g_red_paddle_movement.y = -1.0f;
     }
 
     if (key_state[SDL_SCANCODE_UP])
     {
-        g_shield_movement.y = 1.0f;
+        g_blue_paddle_movement.y = 1.0f;
     }
     else if (key_state[SDL_SCANCODE_DOWN])
     {
-        g_shield_movement.y = -1.0f;
+        g_blue_paddle_movement.y = -1.0f;
     }
 }
 
@@ -228,8 +237,13 @@ void update()
     g_blue_paddle_matrix = glm::rotate(g_blue_paddle_matrix,
         g_rotation_blue_paddle.y,
         glm::vec3(0.0f, 1.0f, 0.0f));*/
+    g_red_paddle_position += g_red_paddle_movement * g_paddle_speed * delta_time;
     g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, INIT_POS_RED_PADDLE);
+    g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, g_red_paddle_position);
+    
+    g_blue_paddle_position += g_blue_paddle_movement * g_paddle_speed * delta_time;
     g_blue_paddle_matrix = glm::translate(g_blue_paddle_matrix, INIT_POS_BLUE_PADDLE);
+    g_blue_paddle_matrix = glm::translate(g_blue_paddle_matrix, g_blue_paddle_position);
 
     g_red_paddle_matrix = glm::scale(g_red_paddle_matrix, INIT_SCALE);
     g_blue_paddle_matrix = glm::scale(g_blue_paddle_matrix, INIT_SCALE);
