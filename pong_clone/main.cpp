@@ -42,7 +42,7 @@ TEXTURE_BORDER = 0; // this value MUST be zero
 constexpr char RED_PADDLE_SPRITE_FILEPATH[] = "red_paddle.png",
 BLUE_PADDLE_SPRITE_FILEPATH[] = "blue_paddle.png";
 
-constexpr glm::vec3 INIT_SCALE = glm::vec3(0.5f, 1.5119f, 0.0f),
+constexpr glm::vec3 INIT_SCALE = glm::vec3(0.25f, 0.75595f, 0.0f),
 INIT_POS_RED_PADDLE = glm::vec3(-4.0f, 0.0f, 0.0f),
 INIT_POS_BLUE_PADDLE = glm::vec3(4.0f, 0.0f, 0.0f);
 
@@ -64,6 +64,9 @@ g_rotation_blue_paddle = glm::vec3(0.0f, 0.0f, 0.0f);
 
 GLuint g_red_paddle_texture_id,
 g_blue_paddle_texture_id;
+
+glm::vec3 g_red_paddle_transformation = glm::vec3(0.0f, 0.0f, 0.0f),
+g_blue_paddle_transformation = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
 GLuint load_texture(const char* filepath)
@@ -148,10 +151,55 @@ void process_input()
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
-        if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE)
+        switch (event.type)
         {
-            g_app_status = TERMINATED;
+            case SDL_QUIT:
+            case SDL_WINDOWEVENT_CLOSE:
+                g_app_status = TERMINATED;
+                break;
+
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                    case SDLK_LEFT:
+                        // Move the player left
+                        break;
+
+                    case SDLK_RIGHT:
+                        // Move the player right
+                        g_shield_movement.x = 1.0f;
+                        break;
+
+                    case SDLK_q:
+                        // Quit the game with a keystroke
+                        g_app_status = TERMINATED;
+                        break;
+
+                    default:
+                        break;
+                }
+
         }
+    }
+
+    const Uint8* key_state = SDL_GetKeyboardState(NULL);
+
+    if (key_state[SDL_SCANCODE_LEFT])
+    {
+        g_shield_movement.x = -1.0f;
+    }
+    else if (key_state[SDL_SCANCODE_RIGHT])
+    {   
+        g_shield_movement.x = 1.0f;
+    }
+
+    if (key_state[SDL_SCANCODE_UP])
+    {
+        g_shield_movement.y = 1.0f;
+    }
+    else if (key_state[SDL_SCANCODE_DOWN])
+    {
+        g_shield_movement.y = -1.0f;
     }
 }
 
