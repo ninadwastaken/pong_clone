@@ -70,9 +70,9 @@ g_blue_paddle_texture_id,
 g_starwars_bg_texture_id,
 g_ball_texture_id;
 
-glm::vec3 g_red_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
+glm::vec3 g_red_paddle_position = glm::vec3(-4.0f, 0.0f, 0.0f),
 g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
-g_blue_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
+g_blue_paddle_position = glm::vec3(4.0f, 0.0f, 0.0f),
 g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
 g_ball_position = glm::vec3(0.0f, 0.0f, 0.0f),
 g_ball_movement = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -80,7 +80,7 @@ g_ball_movement = glm::vec3(0.0f, 1.0f, 0.0f);
 
 
 constexpr float g_paddle_speed = 3.0f;
-constexpr float g_ball_speed = 5.0f;
+constexpr float g_ball_speed = 1.0f;
 
 bool g_single_player_mode = false;
 
@@ -258,8 +258,8 @@ void update()
 
     /* RED PADDLE STUFF */
 
+
     g_red_paddle_position += g_red_paddle_movement * g_paddle_speed * delta_time;
-    g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, INIT_POS_RED_PADDLE);
 
     /* making sure red paddle doesn't go off window */
     if (g_red_paddle_position.y > g_paddles_height_limit) {
@@ -288,7 +288,6 @@ void update()
         g_blue_paddle_position += g_blue_paddle_movement * g_paddle_speed * delta_time;
 
     }
-    g_blue_paddle_matrix = glm::translate(g_blue_paddle_matrix, INIT_POS_BLUE_PADDLE);
 
     /* making sure blue paddle doesn't go off window */
     if (g_blue_paddle_position.y > g_paddles_height_limit) {
@@ -307,8 +306,12 @@ void update()
     /* BALL STUFF */
     g_ball_matrix = glm::mat4(1.0f);
 
-    // float red_paddle_x_distance = fabs(g_ball_position.x - g_red_paddle_position.x) - ((g_paddle_width + g_ball_width) / 2.0f);
-    // float red_paddle_y_distance = fabs(g_ball_position.y - g_red_paddle_position.y) - ((g_paddle_height + g_ball_width) / 2.0f);
+    float red_paddle_x_distance = fabs(g_ball_position.x - g_red_paddle_position.x) - ((g_paddle_width + g_ball_width) / 2.0f);
+    float red_paddle_y_distance = fabs(g_ball_position.y - g_red_paddle_position.y) - ((g_paddle_height + g_ball_width) / 2.0f);
+
+    if (red_paddle_x_distance < 0 and red_paddle_y_distance < 0) {
+        g_ball_movement.x = 1.0f;
+    }
 
     g_ball_position += g_ball_movement * g_ball_speed * delta_time;
 
