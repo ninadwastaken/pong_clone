@@ -41,10 +41,12 @@ TEXTURE_BORDER = 0; // this value MUST be zero
 // source: https://red_paddlenoiro.jp/
 constexpr char RED_PADDLE_SPRITE_FILEPATH[] = "red_paddle.png",
 BLUE_PADDLE_SPRITE_FILEPATH[] = "blue_paddle.png",
-STARWARS_BG_SPRITE_FILEPATH[] = "starwars_bg.jpg";
+STARWARS_BG_SPRITE_FILEPATH[] = "starwars_bg.jpg",
+BALL_FILEPATH[] = "ball.png";
 
 constexpr glm::vec3 INIT_SCALE = glm::vec3(0.25f, 0.75595f, 0.0f),
 INIT_STARWARS_BG_SCALE = glm::vec3(15.0f, 8.43055f, 0.0f),
+INIT_BALL_SCALE = glm::vec3(0.3f, 0.3f, 0.0f),
 INIT_POS_RED_PADDLE = glm::vec3(-4.0f, 0.0f, 0.0f),
 INIT_POS_BLUE_PADDLE = glm::vec3(4.0f, 0.0f, 0.0f);
 
@@ -58,6 +60,7 @@ glm::mat4 g_view_matrix,
 g_red_paddle_matrix,
 g_blue_paddle_matrix,
 g_starwars_bg_matrix,
+g_ball_matrix,
 g_projection_matrix;
 
 float g_previous_ticks = 0.0f;
@@ -67,7 +70,8 @@ g_rotation_blue_paddle = glm::vec3(0.0f, 0.0f, 0.0f);
 
 GLuint g_red_paddle_texture_id,
 g_blue_paddle_texture_id,
-g_starwars_bg_texture_id;
+g_starwars_bg_texture_id,
+g_ball_texture_id;
 
 glm::vec3 g_red_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
 g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -141,6 +145,7 @@ void initialise()
     g_starwars_bg_matrix = glm::mat4(1.0f);
     g_red_paddle_matrix = glm::mat4(1.0f);
     g_blue_paddle_matrix = glm::mat4(1.0f);
+    g_ball_matrix = glm::mat4(1.0f);
     g_view_matrix = glm::mat4(1.0f);
     g_projection_matrix = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
 
@@ -154,6 +159,7 @@ void initialise()
     g_red_paddle_texture_id = load_texture(RED_PADDLE_SPRITE_FILEPATH);
     g_blue_paddle_texture_id = load_texture(BLUE_PADDLE_SPRITE_FILEPATH);
     g_starwars_bg_texture_id = load_texture(STARWARS_BG_SPRITE_FILEPATH);
+    g_ball_texture_id = load_texture(BALL_FILEPATH);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -237,9 +243,12 @@ void update()
     /* Model matrix reset */
     g_red_paddle_matrix = glm::mat4(1.0f);
     g_blue_paddle_matrix = glm::mat4(1.0f);
+    g_ball_matrix = glm::mat4(1.0f);
 
     /* Transformations */
-    
+
+    /* RED PADDLE STUFF */
+
     g_red_paddle_position += g_red_paddle_movement * g_paddle_speed * delta_time;
     g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, INIT_POS_RED_PADDLE);
 
@@ -253,14 +262,15 @@ void update()
     }
 
     g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, g_red_paddle_position);
-    
+    g_red_paddle_matrix = glm::scale(g_red_paddle_matrix, INIT_SCALE);
 
+    /* BLUE PADDLE STUFF */
     if (g_single_player_mode) {
         g_blue_paddle_position.y += g_paddle_speed * delta_time * single_player_mode_upwards_ball_direction;
         if (g_blue_paddle_position.y == g_paddles_height_limit) {
             single_player_mode_upwards_ball_direction = -1;
         }
-        else if(g_blue_paddle_position.y == -g_paddles_height_limit) {
+        else if (g_blue_paddle_position.y == -g_paddles_height_limit) {
             single_player_mode_upwards_ball_direction = 1;
         }
     }
@@ -282,8 +292,11 @@ void update()
 
     g_blue_paddle_matrix = glm::translate(g_blue_paddle_matrix, g_blue_paddle_position);
 
-    g_red_paddle_matrix = glm::scale(g_red_paddle_matrix, INIT_SCALE);
     g_blue_paddle_matrix = glm::scale(g_blue_paddle_matrix, INIT_SCALE);
+
+
+    /* BALL STUFF */
+    g_ball_matrix = glm::scale(g_ball_matrix, INIT_BALL_SCALE);
 }
 
 
@@ -325,6 +338,7 @@ void render()
     draw_object(g_starwars_bg_matrix, g_starwars_bg_texture_id);
     draw_object(g_red_paddle_matrix, g_red_paddle_texture_id);
     draw_object(g_blue_paddle_matrix, g_blue_paddle_texture_id);
+    draw_object(g_ball_matrix, g_ball_texture_id);
 
     // We disable two attribute arrays now
     glDisableVertexAttribArray(g_shader_program.get_position_attribute());
