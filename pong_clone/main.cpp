@@ -40,9 +40,11 @@ TEXTURE_BORDER = 0; // this value MUST be zero
 
 // source: https://red_paddlenoiro.jp/
 constexpr char RED_PADDLE_SPRITE_FILEPATH[] = "red_paddle.png",
-BLUE_PADDLE_SPRITE_FILEPATH[] = "blue_paddle.png";
+BLUE_PADDLE_SPRITE_FILEPATH[] = "blue_paddle.png",
+STARWARS_BG_SPRITE_FILEPATH[] = "starwars_bg.jpg";
 
 constexpr glm::vec3 INIT_SCALE = glm::vec3(0.25f, 0.75595f, 0.0f),
+INIT_STARWARS_BG_SCALE = glm::vec3(15.0f, 8.43055f, 0.0f),
 INIT_POS_RED_PADDLE = glm::vec3(-4.0f, 0.0f, 0.0f),
 INIT_POS_BLUE_PADDLE = glm::vec3(4.0f, 0.0f, 0.0f);
 
@@ -55,6 +57,7 @@ ShaderProgram g_shader_program = ShaderProgram();
 glm::mat4 g_view_matrix,
 g_red_paddle_matrix,
 g_blue_paddle_matrix,
+g_starwars_bg_matrix,
 g_projection_matrix;
 
 float g_previous_ticks = 0.0f;
@@ -63,7 +66,8 @@ glm::vec3 g_rotation_red_paddle = glm::vec3(0.0f, 0.0f, 0.0f),
 g_rotation_blue_paddle = glm::vec3(0.0f, 0.0f, 0.0f);
 
 GLuint g_red_paddle_texture_id,
-g_blue_paddle_texture_id;
+g_blue_paddle_texture_id,
+g_starwars_bg_texture_id;
 
 glm::vec3 g_red_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
 g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -71,7 +75,7 @@ g_blue_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
 g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
-constexpr float g_paddle_speed = 1.0f;
+constexpr float g_paddle_speed = 3.0f;
 
 bool g_single_player_mode = false;
 
@@ -111,7 +115,7 @@ void initialise()
     // Initialise video and joystick subsystems
     SDL_Init(SDL_INIT_VIDEO);
 
-    g_display_window = SDL_CreateWindow("Hello, Textures!",
+    g_display_window = SDL_CreateWindow("Star Wars Pong",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         WINDOW_WIDTH, WINDOW_HEIGHT,
         SDL_WINDOW_OPENGL);
@@ -134,6 +138,7 @@ void initialise()
 
     g_shader_program.load(V_SHADER_PATH, F_SHADER_PATH);
 
+    g_starwars_bg_matrix = glm::mat4(1.0f);
     g_red_paddle_matrix = glm::mat4(1.0f);
     g_blue_paddle_matrix = glm::mat4(1.0f);
     g_view_matrix = glm::mat4(1.0f);
@@ -148,6 +153,7 @@ void initialise()
 
     g_red_paddle_texture_id = load_texture(RED_PADDLE_SPRITE_FILEPATH);
     g_blue_paddle_texture_id = load_texture(BLUE_PADDLE_SPRITE_FILEPATH);
+    g_starwars_bg_texture_id = load_texture(STARWARS_BG_SPRITE_FILEPATH);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -215,6 +221,10 @@ void process_input()
 constexpr float g_paddles_height_limit = 2.5f;
 void update()
 {
+    /* load bg */
+    g_starwars_bg_matrix = glm::mat4(1.0f);
+    g_starwars_bg_matrix = glm::scale(g_starwars_bg_matrix, INIT_STARWARS_BG_SCALE);
+
     /* Delta time calculations */
     float ticks = (float)SDL_GetTicks() / MILLISECONDS_IN_SECOND;
     float delta_time = ticks - g_previous_ticks;
@@ -312,6 +322,7 @@ void render()
     glEnableVertexAttribArray(g_shader_program.get_tex_coordinate_attribute());
 
     // Bind texture
+    draw_object(g_starwars_bg_matrix, g_starwars_bg_texture_id);
     draw_object(g_red_paddle_matrix, g_red_paddle_texture_id);
     draw_object(g_blue_paddle_matrix, g_blue_paddle_texture_id);
 
