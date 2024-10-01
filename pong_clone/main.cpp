@@ -212,7 +212,7 @@ void process_input()
     }
 }
 
-
+constexpr float g_paddles_height_limit = 2.5f;
 void update()
 {
     /* Delta time calculations */
@@ -239,10 +239,29 @@ void update()
         glm::vec3(0.0f, 1.0f, 0.0f));*/
     g_red_paddle_position += g_red_paddle_movement * g_paddle_speed * delta_time;
     g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, INIT_POS_RED_PADDLE);
+
+    /* making sure paddles don't go off window */
+    if (g_red_paddle_position.y > g_paddles_height_limit) {
+        g_red_paddle_position.y = g_paddles_height_limit;
+    }
+
+    else if (g_red_paddle_position.y < -g_paddles_height_limit) {
+        g_red_paddle_position.y = -g_paddles_height_limit;
+    }
+
     g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, g_red_paddle_position);
     
     g_blue_paddle_position += g_blue_paddle_movement * g_paddle_speed * delta_time;
     g_blue_paddle_matrix = glm::translate(g_blue_paddle_matrix, INIT_POS_BLUE_PADDLE);
+
+    if (g_blue_paddle_position.y > g_paddles_height_limit) {
+        g_blue_paddle_position.y = g_paddles_height_limit;
+    }
+
+    else if (g_blue_paddle_position.y < -g_paddles_height_limit) {
+        g_blue_paddle_position.y = -g_paddles_height_limit;
+    }
+
     g_blue_paddle_matrix = glm::translate(g_blue_paddle_matrix, g_blue_paddle_position);
 
     g_red_paddle_matrix = glm::scale(g_red_paddle_matrix, INIT_SCALE);
