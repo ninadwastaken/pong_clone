@@ -76,14 +76,22 @@ g_ball_texture_id;
 glm::vec3 g_red_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
 g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
 g_blue_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f),
-g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
+g_ball_position = glm::vec3(0.0f, 0.0f, 0.0f),
+g_ball_movement = glm::vec3(0.0f, 1.0f, 0.0f);
+
 
 
 constexpr float g_paddle_speed = 3.0f;
+constexpr float g_ball_speed = 5.0f;
 
 bool g_single_player_mode = false;
 
 float single_player_mode_upwards_ball_direction = 1.0;
+
+constexpr float g_paddle_width = 0.01f;
+constexpr float g_ball_width = 0.01f;
+constexpr float g_paddle_height = 1.0f;
 
 GLuint load_texture(const char* filepath)
 {
@@ -296,7 +304,26 @@ void update()
 
 
     /* BALL STUFF */
+    g_ball_matrix = glm::mat4(1.0f);
+
+    // float red_paddle_x_distance = fabs(g_ball_position.x - g_red_paddle_position.x) - ((g_paddle_width + g_ball_width) / 2.0f);
+    // float red_paddle_y_distance = fabs(g_ball_position.y - g_red_paddle_position.y) - ((g_paddle_height + g_ball_width) / 2.0f);
+
+    g_ball_position += g_ball_movement * g_ball_speed * delta_time;
+
+    if (g_ball_position.y > g_paddles_height_limit) {
+        g_ball_movement.y = -1.0f;
+    }
+    else if (g_ball_position.y < -g_paddles_height_limit) {
+        g_ball_movement.y = 1.0f;
+    }
+
+    g_ball_matrix = glm::translate(g_ball_matrix, g_ball_position);
+
+
     g_ball_matrix = glm::scale(g_ball_matrix, INIT_BALL_SCALE);
+
+
 }
 
 
