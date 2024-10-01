@@ -73,6 +73,9 @@ g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
 
 constexpr float g_paddle_speed = 1.0f;
 
+bool g_single_player_mode = false;
+
+float single_player_mode_upwards_ball_direction = 1.0;
 
 GLuint load_texture(const char* filepath)
 {
@@ -166,22 +169,9 @@ void process_input()
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym)
                 {
-                    case SDLK_w:
-                        // Move the player left
-                        //g_red_paddle_movement.y = 1.0f;
-                        break;
-
-                    case SDLK_s:
-                        // Move the player right
-                        //g_red_paddle_movement.y = -1.0f;
-                        break;
-
-                    case SDLK_UP:
-                        //g_blue_paddle_movement.y = 1.0f;
-                        break;
-
-                    case SDLK_DOWN:
-                        //g_blue_paddle_movement.y = -1.0f;
+                    case SDLK_t:
+                        g_single_player_mode = not g_single_player_mode;
+                        single_player_mode_upwards_ball_direction = g_blue_paddle_movement.y ? g_blue_paddle_movement.y : 1.0f;
                         break;
 
                     default:
@@ -222,7 +212,6 @@ void process_input()
         g_blue_paddle_movement.y = 0.0f;
     }
 }
-
 constexpr float g_paddles_height_limit = 2.5f;
 void update()
 {
@@ -255,7 +244,21 @@ void update()
 
     g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, g_red_paddle_position);
     
-    g_blue_paddle_position += g_blue_paddle_movement * g_paddle_speed * delta_time;
+
+    if (g_single_player_mode) {
+        g_blue_paddle_position.y += g_paddle_speed * delta_time * single_player_mode_upwards_ball_direction;
+        if (g_blue_paddle_position.y == g_paddles_height_limit) {
+            single_player_mode_upwards_ball_direction = -1;
+        }
+        else if(g_blue_paddle_position.y == -g_paddles_height_limit) {
+            single_player_mode_upwards_ball_direction = 1;
+        }
+    }
+
+    else {
+        g_blue_paddle_position += g_blue_paddle_movement * g_paddle_speed * delta_time;
+
+    }
     g_blue_paddle_matrix = glm::translate(g_blue_paddle_matrix, INIT_POS_BLUE_PADDLE);
 
     /* making sure blue paddle doesn't go off window */
