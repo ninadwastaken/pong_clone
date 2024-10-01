@@ -65,9 +65,6 @@ g_projection_matrix;
 
 float g_previous_ticks = 0.0f;
 
-glm::vec3 g_rotation_red_paddle = glm::vec3(0.0f, 0.0f, 0.0f),
-g_rotation_blue_paddle = glm::vec3(0.0f, 0.0f, 0.0f);
-
 GLuint g_red_paddle_texture_id,
 g_blue_paddle_texture_id,
 g_starwars_bg_texture_id,
@@ -92,6 +89,8 @@ float single_player_mode_upwards_ball_direction = 1.0;
 constexpr float g_paddle_width = 0.01f;
 constexpr float g_ball_width = 0.01f;
 constexpr float g_paddle_height = 1.0f;
+
+void reset_game();
 
 GLuint load_texture(const char* filepath)
 {
@@ -194,6 +193,10 @@ void process_input()
                         single_player_mode_upwards_ball_direction = g_blue_paddle_movement.y ? g_blue_paddle_movement.y : 1.0f;
                         break;
 
+                    case SDLK_p:
+                        reset_game();
+                        break;
+
                     default:
                         break;
                 }
@@ -245,8 +248,6 @@ void update()
     g_previous_ticks = ticks;
 
     /* Game logic */
-    g_rotation_red_paddle.y += ROT_INCREMENT * delta_time;
-    g_rotation_blue_paddle.y += -1 * ROT_INCREMENT * delta_time;
 
     /* Model matrix reset */
     g_red_paddle_matrix = glm::mat4(1.0f);
@@ -326,6 +327,14 @@ void update()
 
 }
 
+void reset_game() {
+    g_red_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_blue_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball_movement = glm::vec3(0.0f, 1.0f, 0.0f);
+}
 
 void draw_object(glm::mat4& object_g_model_matrix, GLuint& object_texture_id)
 {
