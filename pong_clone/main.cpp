@@ -168,20 +168,20 @@ void process_input()
                 {
                     case SDLK_w:
                         // Move the player left
-                        g_red_paddle_movement.y = 1.0f;
+                        //g_red_paddle_movement.y = 1.0f;
                         break;
 
                     case SDLK_s:
                         // Move the player right
-                        g_red_paddle_movement.y = -1.0f;
+                        //g_red_paddle_movement.y = -1.0f;
                         break;
 
                     case SDLK_UP:
-                        g_blue_paddle_movement.y = 1.0f;
+                        //g_blue_paddle_movement.y = 1.0f;
                         break;
 
                     case SDLK_DOWN:
-                        g_blue_paddle_movement.y = -1.0f;
+                        //g_blue_paddle_movement.y = -1.0f;
                         break;
 
                     default:
@@ -202,6 +202,12 @@ void process_input()
         g_red_paddle_movement.y = -1.0f;
     }
 
+    if (not (key_state[SDL_SCANCODE_W] xor key_state[SDL_SCANCODE_S]))
+    {
+        g_red_paddle_movement.y = 0.0f;
+    }
+    
+
     if (key_state[SDL_SCANCODE_UP])
     {
         g_blue_paddle_movement.y = 1.0f;
@@ -209,6 +215,11 @@ void process_input()
     else if (key_state[SDL_SCANCODE_DOWN])
     {
         g_blue_paddle_movement.y = -1.0f;
+    }
+
+    if (not (key_state[SDL_SCANCODE_UP] xor key_state[SDL_SCANCODE_DOWN]))
+    {
+        g_blue_paddle_movement.y = 0.0f;
     }
 }
 
@@ -229,18 +240,11 @@ void update()
     g_blue_paddle_matrix = glm::mat4(1.0f);
 
     /* Transformations */
-    /*
-    g_red_paddle_matrix = glm::rotate(g_red_paddle_matrix,
-        g_rotation_red_paddle.y,
-        glm::vec3(0.0f, 1.0f, 0.0f));
-
-    g_blue_paddle_matrix = glm::rotate(g_blue_paddle_matrix,
-        g_rotation_blue_paddle.y,
-        glm::vec3(0.0f, 1.0f, 0.0f));*/
+    
     g_red_paddle_position += g_red_paddle_movement * g_paddle_speed * delta_time;
     g_red_paddle_matrix = glm::translate(g_red_paddle_matrix, INIT_POS_RED_PADDLE);
 
-    /* making sure paddles don't go off window */
+    /* making sure red paddle doesn't go off window */
     if (g_red_paddle_position.y > g_paddles_height_limit) {
         g_red_paddle_position.y = g_paddles_height_limit;
     }
@@ -254,6 +258,7 @@ void update()
     g_blue_paddle_position += g_blue_paddle_movement * g_paddle_speed * delta_time;
     g_blue_paddle_matrix = glm::translate(g_blue_paddle_matrix, INIT_POS_BLUE_PADDLE);
 
+    /* making sure blue paddle doesn't go off window */
     if (g_blue_paddle_position.y > g_paddles_height_limit) {
         g_blue_paddle_position.y = g_paddles_height_limit;
     }
