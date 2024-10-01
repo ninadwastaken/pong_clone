@@ -80,7 +80,7 @@ g_ball_movement = glm::vec3(-1.0f, 1.0f, 0.0f);
 
 
 constexpr float g_paddle_speed = 3.0f;
-constexpr float g_ball_speed = 1.0f;
+constexpr float g_ball_speed = 4.0f;
 
 bool g_single_player_mode = false;
 
@@ -318,6 +318,13 @@ void update()
 
     if (blue_paddle_x_distance < 0 and blue_paddle_y_distance < 0) {
         g_ball_movement.x = -1.0f;
+    }
+
+    if (g_ball_position.x > 4.0f + 1.0f) {
+        reset_game();
+    }
+    else if (g_ball_position.x < -4.0f - 1.0f) {
+        reset_game();
     }
 
     g_ball_position += g_ball_movement * g_ball_speed * delta_time;
