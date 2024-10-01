@@ -225,7 +225,7 @@ void process_input()
     {
         g_blue_paddle_movement.y = 1.0f;
     }
-    else if (key_state[SDL_SCANCODE_DOWN])
+    else if (key_state[SDL_SCANCODE_DOWN]) 
     {
         g_blue_paddle_movement.y = -1.0f;
     }
