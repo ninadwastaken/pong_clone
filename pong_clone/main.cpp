@@ -75,7 +75,7 @@ g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
 g_blue_paddle_position = glm::vec3(4.0f, 0.0f, 0.0f),
 g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
 g_ball_position = glm::vec3(0.0f, 0.0f, 0.0f),
-g_ball_movement = glm::vec3(0.0f, 1.0f, 0.0f);
+g_ball_movement = glm::vec3(-1.0f, 1.0f, 0.0f);
 
 
 
@@ -86,9 +86,9 @@ bool g_single_player_mode = false;
 
 float single_player_mode_upwards_ball_direction = 1.0;
 
-constexpr float g_paddle_width = 0.01f;
-constexpr float g_ball_width = 0.01f;
-constexpr float g_paddle_height = 1.0f;
+constexpr float g_paddle_width = 0.1f;
+constexpr float g_ball_width = 0.2f;
+constexpr float g_paddle_height = 0.8f;
 
 void reset_game();
 
@@ -313,6 +313,13 @@ void update()
         g_ball_movement.x = 1.0f;
     }
 
+    float blue_paddle_x_distance = fabs(g_ball_position.x - g_blue_paddle_position.x) - ((g_paddle_width + g_ball_width) / 2.0f);
+    float blue_paddle_y_distance = fabs(g_ball_position.y - g_blue_paddle_position.y) - ((g_paddle_height + g_ball_width) / 2.0f);
+
+    if (blue_paddle_x_distance < 0 and blue_paddle_y_distance < 0) {
+        g_ball_movement.x = -1.0f;
+    }
+
     g_ball_position += g_ball_movement * g_ball_speed * delta_time;
 
     if (g_ball_position.y > g_paddles_height_limit) {
@@ -331,12 +338,12 @@ void update()
 }
 
 void reset_game() {
-    g_red_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_red_paddle_position = glm::vec3(-4.0f, 0.0f, 0.0f);
     g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
-    g_blue_paddle_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_blue_paddle_position = glm::vec3(4.0f, 0.0f, 0.0f);
     g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
     g_ball_position = glm::vec3(0.0f, 0.0f, 0.0f);
-    g_ball_movement = glm::vec3(0.0f, 1.0f, 0.0f);
+    g_ball_movement = glm::vec3(-1.0f, 1.0f, 0.0f);
 }
 
 void draw_object(glm::mat4& object_g_model_matrix, GLuint& object_texture_id)
