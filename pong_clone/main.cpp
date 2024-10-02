@@ -102,6 +102,11 @@ bool show_ball2 = false,
 show_ball3 = false;
 
 void reset_game();
+void start_game();
+
+bool g_start_game = true,
+g_dark_side_won = true,
+g_light_side_won = false;
 
 GLuint load_texture(const char* filepath)
 {
@@ -224,6 +229,12 @@ void process_input()
                         show_ball2 = true;
                         show_ball3 = true;
                         break;
+
+                    case SDLK_CAPSLOCK:
+                        if (not g_start_game) {
+                            start_game();
+                        }
+
 
                     default:
                         break;
@@ -452,6 +463,22 @@ void update()
 }
 
 void reset_game() {
+    g_start_game = false;
+    g_red_paddle_position = glm::vec3(-4.0f, 0.0f, 0.0f);
+    g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_blue_paddle_position = glm::vec3(4.0f, 0.0f, 0.0f);
+    g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball2_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball2_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball3_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball3_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    
+}
+
+void start_game() {
+    g_start_game = true;
     g_red_paddle_position = glm::vec3(-4.0f, 0.0f, 0.0f);
     g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
     g_blue_paddle_position = glm::vec3(4.0f, 0.0f, 0.0f);
