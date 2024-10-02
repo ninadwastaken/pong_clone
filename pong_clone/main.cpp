@@ -61,6 +61,8 @@ g_red_paddle_matrix,
 g_blue_paddle_matrix,
 g_starwars_bg_matrix,
 g_ball_matrix,
+g_ball2_matrix,
+g_ball3_matrix,
 g_projection_matrix;
 
 float g_previous_ticks = 0.0f;
@@ -68,19 +70,25 @@ float g_previous_ticks = 0.0f;
 GLuint g_red_paddle_texture_id,
 g_blue_paddle_texture_id,
 g_starwars_bg_texture_id,
-g_ball_texture_id;
+g_ball_texture_id,
+g_ball2_texture_id,
+g_ball3_texture_id;
 
 glm::vec3 g_red_paddle_position = glm::vec3(-4.0f, 0.0f, 0.0f),
 g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
 g_blue_paddle_position = glm::vec3(4.0f, 0.0f, 0.0f),
 g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
 g_ball_position = glm::vec3(0.0f, 0.0f, 0.0f),
-g_ball_movement = glm::vec3(-1.0f, 1.0f, 0.0f);
+g_ball_movement = glm::vec3(-1.0f, 1.0f, 0.0f),
+g_ball2_position = glm::vec3(0.0f, 0.0f, 0.0f),
+g_ball2_movement = glm::vec3(1.0f, 1.0f, 0.0f),
+g_ball3_position = glm::vec3(0.0f, 0.0f, 0.0f),
+g_ball3_movement = glm::vec3(-1.0f, -1.0f, 0.0f);
 
 
 
 constexpr float g_paddle_speed = 3.0f;
-constexpr float g_ball_speed = 4.0f;
+constexpr float g_ball_speed = 1.0f;
 
 bool g_single_player_mode = false;
 
@@ -89,6 +97,9 @@ float single_player_mode_upwards_ball_direction = 1.0;
 constexpr float g_paddle_width = 0.1f;
 constexpr float g_ball_width = 0.2f;
 constexpr float g_paddle_height = 0.8f;
+
+bool show_ball2 = false,
+show_ball3 = false;
 
 void reset_game();
 
@@ -167,6 +178,8 @@ void initialise()
     g_blue_paddle_texture_id = load_texture(BLUE_PADDLE_SPRITE_FILEPATH);
     g_starwars_bg_texture_id = load_texture(STARWARS_BG_SPRITE_FILEPATH);
     g_ball_texture_id = load_texture(BALL_FILEPATH);
+    g_ball2_texture_id = load_texture(BALL_FILEPATH);
+    g_ball3_texture_id = load_texture(BALL_FILEPATH);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -195,6 +208,21 @@ void process_input()
 
                     case SDLK_p:
                         reset_game();
+                        break;
+
+                    case SDLK_1:
+                        show_ball2 = false;
+                        show_ball3 = false;
+                        break;
+
+                    case SDLK_2:
+                        show_ball2 = true;
+                        show_ball3 = false;
+                        break;
+
+                    case SDLK_3:
+                        show_ball2 = true;
+                        show_ball3 = true;
                         break;
 
                     default:
@@ -252,7 +280,6 @@ void update()
     /* Model matrix reset */
     g_red_paddle_matrix = glm::mat4(1.0f);
     g_blue_paddle_matrix = glm::mat4(1.0f);
-    g_ball_matrix = glm::mat4(1.0f);
 
     /* Transformations */
 
@@ -341,6 +368,86 @@ void update()
 
     g_ball_matrix = glm::scale(g_ball_matrix, INIT_BALL_SCALE);
 
+    /* BALL2 STUFF */
+
+    g_ball2_matrix = glm::mat4(1.0f);
+
+    float red_paddle_x_distance2 = fabs(g_ball2_position.x - g_red_paddle_position.x) - ((g_paddle_width + g_ball_width) / 2.0f);
+    float red_paddle_y_distance2 = fabs(g_ball2_position.y - g_red_paddle_position.y) - ((g_paddle_height + g_ball_width) / 2.0f);
+
+    if (red_paddle_x_distance2 < 0 and red_paddle_y_distance2 < 0) {
+        g_ball2_movement.x = 1.0f;
+    }
+
+    float blue_paddle_x_distance2 = fabs(g_ball2_position.x - g_blue_paddle_position.x) - ((g_paddle_width + g_ball_width) / 2.0f);
+    float blue_paddle_y_distance2 = fabs(g_ball2_position.y - g_blue_paddle_position.y) - ((g_paddle_height + g_ball_width) / 2.0f);
+
+    if (blue_paddle_x_distance2 < 0 and blue_paddle_y_distance2 < 0) {
+        g_ball2_movement.x = -1.0f;
+    }
+
+    if (g_ball2_position.x > 4.0f + 1.0f) {
+        reset_game();
+    }
+    else if (g_ball2_position.x < -4.0f - 1.0f) {
+        reset_game();
+    }
+
+    if (g_ball2_position.y > g_paddles_height_limit) {
+        g_ball2_movement.y = -1.0f;
+    }
+    else if (g_ball2_position.y < -g_paddles_height_limit) {
+        g_ball2_movement.y = 1.0f;
+    }
+
+    if (show_ball2) {
+        g_ball2_position += g_ball2_movement * g_ball_speed * delta_time;
+        g_ball2_matrix = glm::translate(g_ball2_matrix, g_ball2_position);
+    }
+    
+
+    g_ball2_matrix = glm::scale(g_ball2_matrix, INIT_BALL_SCALE);
+
+    /* BALL3 STUFF */
+
+    g_ball3_matrix = glm::mat4(1.0f);
+
+    float red_paddle_x_distance3 = fabs(g_ball3_position.x - g_red_paddle_position.x) - ((g_paddle_width + g_ball_width) / 2.0f);
+    float red_paddle_y_distance3 = fabs(g_ball3_position.y - g_red_paddle_position.y) - ((g_paddle_height + g_ball_width) / 2.0f);
+
+    if (red_paddle_x_distance3 < 0 and red_paddle_y_distance3 < 0) {
+        g_ball3_movement.x = 1.0f;
+    }
+
+    float blue_paddle_x_distance3 = fabs(g_ball3_position.x - g_blue_paddle_position.x) - ((g_paddle_width + g_ball_width) / 2.0f);
+    float blue_paddle_y_distance3 = fabs(g_ball3_position.y - g_blue_paddle_position.y) - ((g_paddle_height + g_ball_width) / 2.0f);
+
+    if (blue_paddle_x_distance3 < 0 and blue_paddle_y_distance3 < 0) {
+        g_ball3_movement.x = -1.0f;
+    }
+
+    if (g_ball3_position.x > 4.0f + 1.0f) {
+        reset_game();
+    }
+    else if (g_ball3_position.x < -4.0f - 1.0f) {
+        reset_game();
+    }
+
+    if (g_ball3_position.y > g_paddles_height_limit) {
+        g_ball3_movement.y = -1.0f;
+    }
+    else if (g_ball3_position.y < -g_paddles_height_limit) {
+        g_ball3_movement.y = 1.0f;
+    }
+
+    if (show_ball3) {
+        g_ball3_position += g_ball3_movement * g_ball_speed * delta_time;
+        g_ball3_matrix = glm::translate(g_ball3_matrix, g_ball3_position);
+    }
+
+
+    g_ball3_matrix = glm::scale(g_ball3_matrix, INIT_BALL_SCALE);
+
 
 }
 
@@ -351,6 +458,10 @@ void reset_game() {
     g_blue_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
     g_ball_position = glm::vec3(0.0f, 0.0f, 0.0f);
     g_ball_movement = glm::vec3(-1.0f, 1.0f, 0.0f);
+    g_ball2_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball2_movement = glm::vec3(1.0f, 1.0f, 0.0f);
+    g_ball3_position = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball3_movement = glm::vec3(-1.0f, -1.0f, 0.0f);
 }
 
 void draw_object(glm::mat4& object_g_model_matrix, GLuint& object_texture_id)
@@ -392,6 +503,14 @@ void render()
     draw_object(g_red_paddle_matrix, g_red_paddle_texture_id);
     draw_object(g_blue_paddle_matrix, g_blue_paddle_texture_id);
     draw_object(g_ball_matrix, g_ball_texture_id);
+
+    if (show_ball2) {
+        draw_object(g_ball2_matrix, g_ball2_texture_id);
+    }
+
+    if (show_ball3) {
+        draw_object(g_ball3_matrix, g_ball3_texture_id);
+    }
 
     // We disable two attribute arrays now
     glDisableVertexAttribArray(g_shader_program.get_position_attribute());
