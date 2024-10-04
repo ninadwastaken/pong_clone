@@ -97,7 +97,7 @@ g_ball3_movement = glm::vec3(-1.0f, -1.0f, 0.0f);
 
 
 constexpr float g_paddle_speed = 3.0f;
-constexpr float g_ball_speed = 1.0f;
+float g_ball_speed = 1.0f;
 
 bool g_single_player_mode = false;
 
@@ -300,6 +300,10 @@ void update()
     g_previous_ticks = ticks;
 
     /* Game logic */
+
+    if (g_start_game) {
+        g_ball_speed += 0.000001 * ticks;
+    }
 
     /* Model matrix reset */
     g_red_paddle_matrix = glm::mat4(1.0f);
@@ -505,6 +509,7 @@ void reset_game() {
     g_ball2_movement = glm::vec3(0.0f, 0.0f, 0.0f);
     g_ball3_position = glm::vec3(0.0f, 0.0f, 0.0f);
     g_ball3_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+    g_ball_speed = 1.0f;
     
 }
 
