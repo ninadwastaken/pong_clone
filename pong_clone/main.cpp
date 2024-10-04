@@ -181,6 +181,9 @@ void initialise()
     g_ball2_matrix = glm::mat4(1.0f);
     g_ball3_matrix = glm::mat4(1.0f);
     g_view_matrix = glm::mat4(1.0f);
+    g_start_game_pic_matrix = glm::mat4(1.0f);
+    g_light_side_wins_pic_matrix = glm::mat4(1.0f);
+    g_dark_side_wins_pic_matrix = glm::mat4(1.0f);
     g_projection_matrix = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
 
     g_shader_program.set_projection_matrix(g_projection_matrix);
@@ -477,6 +480,15 @@ void update()
 
 
     g_ball3_matrix = glm::scale(g_ball3_matrix, INIT_BALL_SCALE);
+
+    /* PICTURE STUFF */
+
+    g_start_game_pic_matrix = glm::mat4(1.0f);
+    g_start_game_pic_matrix = glm::scale(g_start_game_pic_matrix, glm::vec3(10.0f, 5.0f, 0.0f));
+    g_light_side_wins_pic_matrix = glm::mat4(1.0f);
+    g_light_side_wins_pic_matrix = glm::scale(g_light_side_wins_pic_matrix, glm::vec3(10.0f, 5.0f, 0.0f));
+    g_dark_side_wins_pic_matrix = glm::mat4(1.0f);
+    g_dark_side_wins_pic_matrix = glm::scale(g_dark_side_wins_pic_matrix, glm::vec3(10.0f, 5.0f, 0.0f));
 
 
 }
