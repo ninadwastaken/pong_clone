@@ -42,7 +42,10 @@ TEXTURE_BORDER = 0; // this value MUST be zero
 constexpr char RED_PADDLE_SPRITE_FILEPATH[] = "red_paddle.png",
 BLUE_PADDLE_SPRITE_FILEPATH[] = "blue_paddle.png",
 STARWARS_BG_SPRITE_FILEPATH[] = "starwars_bg.jpg",
-BALL_FILEPATH[] = "ball.png";
+BALL_FILEPATH[] = "ball.png",
+START_GAME_PIC_FILEPATH[] = "start_game.png",
+DARK_SIDE_WINS_PIC_FILEPATH[] = "dark_side_wins.png",
+LIGHT_SIDE_WINS_PIC_FILEPATH[] = "light_side_wins.png";
 
 constexpr glm::vec3 INIT_SCALE = glm::vec3(0.25f, 0.75595f, 0.0f),
 INIT_STARWARS_BG_SCALE = glm::vec3(15.0f, 8.43055f, 0.0f),
@@ -63,7 +66,10 @@ g_starwars_bg_matrix,
 g_ball_matrix,
 g_ball2_matrix,
 g_ball3_matrix,
-g_projection_matrix;
+g_projection_matrix,
+g_start_game_pic_matrix,
+g_dark_side_wins_pic_matrix,
+g_light_side_wins_pic_matrix;
 
 float g_previous_ticks = 0.0f;
 
@@ -72,7 +78,10 @@ g_blue_paddle_texture_id,
 g_starwars_bg_texture_id,
 g_ball_texture_id,
 g_ball2_texture_id,
-g_ball3_texture_id;
+g_ball3_texture_id,
+g_start_game_pic_texture_id,
+g_dark_side_wins_pic_texture_id,
+g_light_side_wins_pic_texture_id;
 
 glm::vec3 g_red_paddle_position = glm::vec3(-4.0f, 0.0f, 0.0f),
 g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f),
@@ -104,8 +113,8 @@ show_ball3 = false;
 void reset_game();
 void start_game();
 
-bool g_start_game = true,
-g_dark_side_won = true,
+bool g_start_game = false,
+g_dark_side_won = false,
 g_light_side_won = false;
 
 GLuint load_texture(const char* filepath)
@@ -169,6 +178,8 @@ void initialise()
     g_red_paddle_matrix = glm::mat4(1.0f);
     g_blue_paddle_matrix = glm::mat4(1.0f);
     g_ball_matrix = glm::mat4(1.0f);
+    g_ball2_matrix = glm::mat4(1.0f);
+    g_ball3_matrix = glm::mat4(1.0f);
     g_view_matrix = glm::mat4(1.0f);
     g_projection_matrix = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
 
@@ -185,6 +196,9 @@ void initialise()
     g_ball_texture_id = load_texture(BALL_FILEPATH);
     g_ball2_texture_id = load_texture(BALL_FILEPATH);
     g_ball3_texture_id = load_texture(BALL_FILEPATH);
+    g_start_game_pic_texture_id = load_texture(START_GAME_PIC_FILEPATH);
+    g_light_side_wins_pic_texture_id = load_texture(LIGHT_SIDE_WINS_PIC_FILEPATH);
+    g_dark_side_wins_pic_texture_id = load_texture(DARK_SIDE_WINS_PIC_FILEPATH);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -209,10 +223,6 @@ void process_input()
                     case SDLK_t:
                         g_single_player_mode = not g_single_player_mode;
                         single_player_mode_upwards_ball_direction = g_blue_paddle_movement.y ? g_blue_paddle_movement.y : 1.0f;
-                        break;
-
-                    case SDLK_p:
-                        reset_game();
                         break;
 
                     case SDLK_1:
@@ -359,13 +369,14 @@ void update()
     }
 
     if (g_ball_position.x > 4.0f + 1.0f) {
+        g_dark_side_won = true;
         reset_game();
     }
     else if (g_ball_position.x < -4.0f - 1.0f) {
+        g_light_side_won = true;
         reset_game();
     }
 
-    g_ball_position += g_ball_movement * g_ball_speed * delta_time;
 
     if (g_ball_position.y > g_paddles_height_limit) {
         g_ball_movement.y = -1.0f;
@@ -374,8 +385,11 @@ void update()
         g_ball_movement.y = 1.0f;
     }
 
-    g_ball_matrix = glm::translate(g_ball_matrix, g_ball_position);
-
+    if (g_start_game) {
+        g_ball_position += g_ball_movement * g_ball_speed * delta_time;
+        g_ball_matrix = glm::translate(g_ball_matrix, g_ball_position);
+    }
+    
 
     g_ball_matrix = glm::scale(g_ball_matrix, INIT_BALL_SCALE);
 
@@ -398,9 +412,12 @@ void update()
     }
 
     if (g_ball2_position.x > 4.0f + 1.0f) {
+        g_dark_side_won = true;
+
         reset_game();
     }
     else if (g_ball2_position.x < -4.0f - 1.0f) {
+        g_light_side_won = true;
         reset_game();
     }
 
@@ -438,9 +455,11 @@ void update()
     }
 
     if (g_ball3_position.x > 4.0f + 1.0f) {
+        g_dark_side_won = true;
         reset_game();
     }
     else if (g_ball3_position.x < -4.0f - 1.0f) {
+        g_light_side_won = true;
         reset_game();
     }
 
@@ -479,6 +498,8 @@ void reset_game() {
 
 void start_game() {
     g_start_game = true;
+    g_dark_side_won = false;
+    g_light_side_won = false;
     g_red_paddle_position = glm::vec3(-4.0f, 0.0f, 0.0f);
     g_red_paddle_movement = glm::vec3(0.0f, 0.0f, 0.0f);
     g_blue_paddle_position = glm::vec3(4.0f, 0.0f, 0.0f);
@@ -529,7 +550,9 @@ void render()
     draw_object(g_starwars_bg_matrix, g_starwars_bg_texture_id);
     draw_object(g_red_paddle_matrix, g_red_paddle_texture_id);
     draw_object(g_blue_paddle_matrix, g_blue_paddle_texture_id);
+
     draw_object(g_ball_matrix, g_ball_texture_id);
+
 
     if (show_ball2) {
         draw_object(g_ball2_matrix, g_ball2_texture_id);
@@ -538,6 +561,20 @@ void render()
     if (show_ball3) {
         draw_object(g_ball3_matrix, g_ball3_texture_id);
     }
+
+    if (!g_start_game) {
+        if (!g_dark_side_won and !g_light_side_won) {
+            draw_object(g_start_game_pic_matrix, g_start_game_pic_texture_id);
+        }
+        else if (g_dark_side_won) {
+            draw_object(g_dark_side_wins_pic_matrix, g_dark_side_wins_pic_texture_id);
+        }
+        else if (g_light_side_won) {
+            draw_object(g_light_side_wins_pic_matrix, g_light_side_wins_pic_texture_id);
+        }
+    }
+
+
 
     // We disable two attribute arrays now
     glDisableVertexAttribArray(g_shader_program.get_position_attribute());
